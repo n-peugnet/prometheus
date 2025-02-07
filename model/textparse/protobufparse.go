@@ -492,7 +492,7 @@ func (p *ProtobufParser) Next() (Entry, error) {
 			// If this is a metric family containing native
 			// histograms, it means we are here thanks to redoClassic state.
 			// Return to native histograms for the consistent flow.
-			if t == clientpb.MetricType_HISTOGRAM || t == clientpb.MetricType_GAUGE_HISTOGRAM &&
+			if (t == clientpb.MetricType_HISTOGRAM || t == clientpb.MetricType_GAUGE_HISTOGRAM) &&
 				isNativeHistogram(p.dec.GetHistogram()) {
 				p.state = EntryHistogram
 			}
