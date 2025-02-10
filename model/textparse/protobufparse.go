@@ -265,7 +265,7 @@ func (p *ProtobufParser) Histogram() ([]byte, *int64, *histogram.Histogram, *his
 // Must only be called after Next returned a help entry.
 // The returned byte slices become invalid after the next call to Next.
 func (p *ProtobufParser) Help() ([]byte, []byte) {
-	return p.seriesBytes.Bytes(), []byte(p.dec.GetHelp())
+	return p.seriesBytes.Bytes(), yoloBytes(p.dec.GetHelp())
 }
 
 // Type returns the metric name and type in the current entry.
