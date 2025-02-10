@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
@@ -210,6 +211,17 @@ func requireEntries(t *testing.T, exp, got []parsedEntry) {
 	t.Helper()
 
 	testutil.RequireEqualWithOptions(t, exp, got, []cmp.Option{
+		// We reuse slices so we sometimes have empty vs nil differences
+		// we need to ignore with cmpopts.EquateEmpty().
+		// However we have to filter out labels, as only
+		// one comparer per type has to be specified,
+		// and RequireEqualWithOptions uses
+		// cmp.Comparer(labels.Equal).
+		cmp.FilterValues(func(x, y any) bool {
+			_, xIsLabels := x.(labels.Labels)
+			_, yIsLabels := y.(labels.Labels)
+			return !xIsLabels && !yIsLabels
+		}, cmpopts.EquateEmpty()),
 		cmp.AllowUnexported(parsedEntry{}),
 	})
 }

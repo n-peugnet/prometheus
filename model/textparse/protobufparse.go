@@ -186,23 +186,31 @@ func (p *ProtobufParser) Histogram() ([]byte, *int64, *histogram.Histogram, *his
 	if h.GetSampleCountFloat() > 0 || h.GetZeroCountFloat() > 0 {
 		// It is a float histogram.
 		fh := histogram.FloatHistogram{
-			Count:           h.GetSampleCountFloat(),
-			Sum:             h.GetSampleSum(),
-			ZeroThreshold:   h.GetZeroThreshold(),
-			ZeroCount:       h.GetZeroCountFloat(),
-			Schema:          h.GetSchema(),
+			Count:         h.GetSampleCountFloat(),
+			Sum:           h.GetSampleSum(),
+			ZeroThreshold: h.GetZeroThreshold(),
+			ZeroCount:     h.GetZeroCountFloat(),
+			Schema:        h.GetSchema(),
+
+			// Decoder reuses slices, so we need to recreate.
 			PositiveSpans:   make([]histogram.Span, len(h.GetPositiveSpan())),
-			PositiveBuckets: h.GetPositiveCount(),
+			PositiveBuckets: make([]float64, len(h.GetPositiveCount())),
 			NegativeSpans:   make([]histogram.Span, len(h.GetNegativeSpan())),
-			NegativeBuckets: h.GetNegativeCount(),
+			NegativeBuckets: make([]float64, len(h.GetNegativeCount())),
 		}
 		for i, span := range h.GetPositiveSpan() {
 			fh.PositiveSpans[i].Offset = span.GetOffset()
 			fh.PositiveSpans[i].Length = span.GetLength()
 		}
+		for i, cnt := range h.GetPositiveCount() {
+			fh.PositiveBuckets[i] = cnt
+		}
 		for i, span := range h.GetNegativeSpan() {
 			fh.NegativeSpans[i].Offset = span.GetOffset()
 			fh.NegativeSpans[i].Length = span.GetLength()
+		}
+		for i, cnt := range h.GetNegativeCount() {
+			fh.NegativeBuckets[i] = cnt
 		}
 		if p.dec.GetType() == dto.MetricType_GAUGE_HISTOGRAM {
 			fh.CounterResetHint = histogram.GaugeType
@@ -225,17 +233,23 @@ func (p *ProtobufParser) Histogram() ([]byte, *int64, *histogram.Histogram, *his
 		ZeroCount:       h.GetZeroCount(),
 		Schema:          h.GetSchema(),
 		PositiveSpans:   make([]histogram.Span, len(h.GetPositiveSpan())),
-		PositiveBuckets: h.GetPositiveDelta(),
+		PositiveBuckets: make([]int64, len(h.GetPositiveDelta())),
 		NegativeSpans:   make([]histogram.Span, len(h.GetNegativeSpan())),
-		NegativeBuckets: h.GetNegativeDelta(),
+		NegativeBuckets: make([]int64, len(h.GetNegativeDelta())),
 	}
 	for i, span := range h.GetPositiveSpan() {
 		sh.PositiveSpans[i].Offset = span.GetOffset()
 		sh.PositiveSpans[i].Length = span.GetLength()
 	}
+	for i, cnt := range h.GetPositiveDelta() {
+		sh.PositiveBuckets[i] = cnt
+	}
 	for i, span := range h.GetNegativeSpan() {
 		sh.NegativeSpans[i].Offset = span.GetOffset()
 		sh.NegativeSpans[i].Length = span.GetLength()
+	}
+	for i, cnt := range h.GetNegativeDelta() {
+		sh.NegativeBuckets[i] = cnt
 	}
 	if p.dec.GetType() == dto.MetricType_GAUGE_HISTOGRAM {
 		sh.CounterResetHint = histogram.GaugeType

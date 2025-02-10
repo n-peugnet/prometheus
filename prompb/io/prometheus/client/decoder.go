@@ -108,16 +108,38 @@ func (m *MetricStreamingDecoder) resetMetric() {
 	m.labels = m.labels[:0]
 	m.TimestampMs = 0
 
+	// TODO(bwplotka): Autogenerate reset functions.
 	if m.Metric.Counter != nil {
+		m.Metric.Counter.Value = 0
 		m.Metric.Counter.CreatedTimestamp = nil
 		m.Metric.Counter.Exemplar = nil
 	}
-	// TODO(bwplotka): Implement the reuse of the complex types instead of resetting.
+	if m.Metric.Gauge != nil {
+		m.Metric.Gauge.Value = 0
+	}
 	if m.Metric.Histogram != nil {
-		m.Metric.Histogram.Reset()
+		m.Metric.Histogram.SampleCount = 0
+		m.Metric.Histogram.SampleCountFloat = 0
+		m.Metric.Histogram.SampleSum = 0
+		m.Metric.Histogram.Bucket = m.Metric.Histogram.Bucket[:0]
+		m.Metric.Histogram.CreatedTimestamp = nil
+		m.Metric.Histogram.Schema = 0
+		m.Metric.Histogram.ZeroThreshold = 0
+		m.Metric.Histogram.ZeroCount = 0
+		m.Metric.Histogram.ZeroCountFloat = 0
+		m.Metric.Histogram.NegativeSpan = m.Metric.Histogram.NegativeSpan[:0]
+		m.Metric.Histogram.NegativeDelta = m.Metric.Histogram.NegativeDelta[:0]
+		m.Metric.Histogram.NegativeCount = m.Metric.Histogram.NegativeCount[:0]
+		m.Metric.Histogram.PositiveSpan = m.Metric.Histogram.PositiveSpan[:0]
+		m.Metric.Histogram.PositiveDelta = m.Metric.Histogram.PositiveDelta[:0]
+		m.Metric.Histogram.PositiveCount = m.Metric.Histogram.PositiveCount[:0]
+		m.Metric.Histogram.Exemplars = m.Metric.Histogram.Exemplars[:0]
 	}
 	if m.Metric.Summary != nil {
-		m.Metric.Summary.Reset()
+		m.Metric.Summary.SampleCount = 0
+		m.Metric.Summary.SampleSum = 0
+		m.Metric.Summary.Quantile = m.Metric.Summary.Quantile[:0]
+		m.Metric.Summary.CreatedTimestamp = nil
 	}
 }
 
