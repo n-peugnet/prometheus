@@ -37,11 +37,11 @@ type MetricStreamingDecoder struct {
 	*Metric       // Without Label, guarded by overridden GetLabel method.
 
 	mfData      []byte
-	metrics     []chunk
+	metrics     []pos
 	metricIndex int
 
 	mData  []byte
-	labels []chunk
+	labels []pos
 }
 
 // NewMetricStreamingDecoder returns Go iterator that unmarshals given protobuf bytes one
@@ -58,7 +58,7 @@ func NewMetricStreamingDecoder(data []byte) *MetricStreamingDecoder {
 		in:           data,
 		MetricFamily: &MetricFamily{},
 		Metric:       &Metric{},
-		metrics:      make([]chunk, 0, 100),
+		metrics:      make([]pos, 0, 100),
 	}
 }
 
@@ -268,7 +268,7 @@ func yoloString(b []byte) string {
 	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
-type chunk struct {
+type pos struct {
 	start, end int
 }
 
@@ -330,7 +330,7 @@ func (m *Metric) unmarshalWithoutLabels(p *MetricStreamingDecoder, dAtA []byte) 
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			p.labels = append(p.labels, chunk{start: iNdEx, end: postIndex})
+			p.labels = append(p.labels, pos{start: iNdEx, end: postIndex})
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -695,7 +695,7 @@ func (m *MetricFamily) unmarshalWithoutMetrics(buf *MetricStreamingDecoder, dAtA
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			buf.metrics = append(buf.metrics, chunk{start: iNdEx, end: postIndex})
+			buf.metrics = append(buf.metrics, pos{start: iNdEx, end: postIndex})
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
