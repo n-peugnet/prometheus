@@ -155,7 +155,7 @@ func (m *MetricStreamingDecoder) GetLabel() {
 // given the protobuf metric model and has to be deduced from the metric family name.
 func (m *MetricStreamingDecoder) Label(b *labels.ScratchBuilder) error {
 	for _, l := range m.labels {
-		if err := parseLabels(m.mData[l.start:l.end], b); err != nil {
+		if err := parseLabel(m.mData[l.start:l.end], b); err != nil {
 			return err
 		}
 	}
