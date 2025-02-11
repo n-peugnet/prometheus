@@ -44,7 +44,7 @@ type MetricStreamingDecoder struct {
 	labels []pos
 }
 
-// NewMetricStreamingDecoder returns Go iterator that unmarshals given protobuf bytes one
+// NewMetricStreamingDecoder returns a Go iterator that unmarshals given protobuf bytes one
 // metric family and metric at the time, allowing efficient streaming.
 //
 // Do not modify MetricStreamingDecoder between iterations as it's reused to save allocations.
