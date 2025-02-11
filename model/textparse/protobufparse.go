@@ -57,7 +57,7 @@ type ProtobufParser struct {
 	seriesBytes *bytes.Buffer
 
 	lset    labels.Labels
-	builder labels.ScratchBuilder // held here to reduce allocations when building Labels
+	builder labels.ScratchBuilder // Held here to reduce allocations when building Labels.
 
 	// fieldPos is the position within a Summary or (legacy) Histogram. -2
 	// is the count. -1 is the sum. Otherwise, it is the index within
@@ -97,7 +97,7 @@ func NewProtobufParser(b []byte, parseClassicHistograms bool, st *labels.SymbolT
 // value, the timestamp if set, and the value of the current sample.
 func (p *ProtobufParser) Series() ([]byte, *int64, float64) {
 	var (
-		ts = &p.dec.TimestampMs // to save allocs, never nil.
+		ts = &p.dec.TimestampMs // To save memory allocations, never nil.
 		v  float64
 	)
 	switch p.dec.GetType() {
@@ -176,7 +176,7 @@ func (p *ProtobufParser) Series() ([]byte, *int64, float64) {
 // value.
 func (p *ProtobufParser) Histogram() ([]byte, *int64, *histogram.Histogram, *histogram.FloatHistogram) {
 	var (
-		ts = &p.dec.TimestampMs // to save allocs, never nil.
+		ts = &p.dec.TimestampMs // To save memory allocations, never nil.
 		h  = p.dec.GetHistogram()
 	)
 
@@ -192,7 +192,7 @@ func (p *ProtobufParser) Histogram() ([]byte, *int64, *histogram.Histogram, *his
 			ZeroCount:     h.GetZeroCountFloat(),
 			Schema:        h.GetSchema(),
 
-			// Decoder reuses slices, so we need to recreate.
+			// Decoder reuses slices, so we need to copy.
 			PositiveSpans:   make([]histogram.Span, len(h.GetPositiveSpan())),
 			PositiveBuckets: make([]float64, len(h.GetPositiveCount())),
 			NegativeSpans:   make([]histogram.Span, len(h.GetNegativeSpan())),

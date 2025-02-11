@@ -164,7 +164,7 @@ func (m *MetricStreamingDecoder) Label(b *labels.ScratchBuilder) error {
 
 // parseLabels is essentially LabelPair.Unmarshal but directly adding into scratch builder
 // and reusing strings.
-func parseLabels(dAtA []byte, b *labels.ScratchBuilder) error {
+func parseLabel(dAtA []byte, b *labels.ScratchBuilder) error {
 	var name, value string
 	l := len(dAtA)
 	iNdEx := 0
